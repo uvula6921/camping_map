@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="../static/css/camping_search.css">
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;300;400;500;700;900&display=swap"
+              rel="stylesheet">
+        <link rel="shortcut icon" href="../static/logo.ico" type="image/x-icon">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+                integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+                crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+                integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+                crossorigin="anonymous"></script>
+        <title>캠핑장 찾기</title>
+        <style>
+            * {
+                font-family: 'Noto Sans KR', sans-serif;
+            }
+
+            body {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            header {
+                position: absolute;
+                top: 0;
+                left: 0;
+                z-index: 100;
+                width: 100%;
+                background: rgba(255, 255, 255, 0, 9);
+                padding-left: 20px;
+                padding-top: 20px;
+            }
+
+            .fit-picture {
+                width: 200px;
+            }
+
+            section {
+                display: flex;
+                height: 50vh;
+            }
+
+            .search {
+                background-color: cornflowerblue;
+                width: 100%;
+                height: 100vh;
+                flex: 1;
+                display: flex;
+                text-align: center;
+                justify-content: center;
+                align-items: center;
+                color: white;
+
+            }
+
+            .text-area h1 {
+                font-weight: 900;
+                font-size: 40px;
+            }
+
+            .text-area p {
+                font-size: 20px;
+            }
+
+            .box {
+                width: 100%;
+                height: 10px;
+                border-bottom: 1px solid whitesmoke;
+            }
+
+
+            .map_search {
+                background-color: grey;
+                width: 100%;
+                height: 100vh;
+                flex: 2;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            #map {
+                border-radius: 10px;
+                border: 1px solid dodgerblue;
+            }
+
+            select {
+                text-align: center;
+                margin: 50px 0;
+                font-size: 20px;
+                width: 100%;
+                height: 35px;
+                text-align-last: center;
+                border-radius: 5px;
+                background-color: white;
+            }
+
+            select:hover {
+                border: 5px solid mediumseagreen;
+                transition: .5s;
+            }
+
+
+            button {
+                width: 50%;
+                height: 50px;
+                border: 0px solid;
+                background-color: mediumseagreen;
+                border-radius: 10px;
+                font-size: 18px;
+                color: #e9f4fb;
+                font-weight: 700;
+                cursor: pointer;
+                margin-top: 50px;
+            }
+
+            button:hover {
+                background-color: green;
+                transition: .5s;
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <div class="logo_container">
+                <a href="/" class="head_A">
+                    <img class="fit-picture"
+                         src="../static/차박.png"
+                         alt="Grapefruit slice atop a pile of other slices">
+                </a>
+            </div>
+        </header>
+
+        <section>
+            <div class="search">
+                <div class="text-area">
+                    <h1>공개 캠핑장 찾기</h1>
+                    <P>시,도 별로 공개된 캠핑장 정보들 입니다.<br>
+                        탭에서 '도'를 선택해 주세요.
+                    </P>
+                    <div class="box"></div>
+
+                    <div class="select">
+                        <select id="sido">
+                            <option value="서울">서울</option>
+                            <option value="경기">경기도</option>
+                            <option value="충청">충청도</option>
+                            <option value="전라">전라도</option>
+                            <option value="경상">경상도</option>
+                            <option value="강원">강원도</option>
+                            <option value="제주">제주도</option>
+                        </select>
+                    </div>
+                    <button type="button" onclick="onclickSearch()" class="btn">찾기</button>
+
+                </div>
+            </div>
+            <div class="map_search">
+                <div id="map" style="width:850px;height:750px;"></div>
+            </div>
+        </section>
+    </body>
+</html>
