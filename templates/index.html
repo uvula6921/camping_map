@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="../static/css/camping_search.css">
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;300;400;500;700;900&display=swap"
+              rel="stylesheet">
+        <link rel="preconnect" href="https://fonts.gstatic.com">
+        <link href="https://fonts.googleapis.com/css2?family=Hi+Melody&display=swap" rel="stylesheet">
+        <link rel="shortcut icon" href="../static/logo.ico" type="image/x-icon">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+                integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+                crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+                integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+                crossorigin="anonymous"></script>
+        <title>캠핑장 찾기</title>
+        <style>
+            * {
+                font-family: 'Noto Sans KR', sans-serif;
+            }
+
+            body {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            header {
+                position: absolute;
+                top: 0;
+                left: 0;
+                z-index: 100;
+                width: 100%;
+                background: rgba(255, 255, 255, 0, 9);
+                padding-top: 20px;
+            }
+
+            .fit-picture {
+                width: 200px;
+            }
+
+            section {
+                height: 50vh;
+            }
+
+            .search {
+                background-color: cornflowerblue;
+                width: 100%;
+                height: 100vh;
+                flex: 1;
+                display: flex;
+                text-align: center;
+                justify-content: center;
+                align-items: center;
+                color: white;
+
+            }
+
+            .text-area h1 {
+                font-weight: 900;
+                font-size: 40px;
+            }
+
+            .text-area p {
+                font-size: 20px;
+            }
+
+            .box {
+                width: 100%;
+                height: 10px;
+                border-bottom: 1px solid whitesmoke;
+            }
+
+
+            .map_search {
+                background-color: grey;
+                width: 100%;
+                height: 100vh;
+                flex: 2;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            #map {
+                border-radius: 10px;
+                border: 1px solid dodgerblue;
+            }
+
+            select {
+                text-align: center;
+                margin: 50px 0;
+                font-size: 20px;
+                width: 100%;
+                height: 35px;
+                text-align-last: center;
+                border-radius: 5px;
+                background-color: white;
+            }
+
+            select:focus-visible {
+                outline: none;
+            }
+
+            button {
+                width: 50%;
+                height: 50px;
+                border: 0px solid;
+                background-color: mediumseagreen;
+                border-radius: 10px;
+                font-size: 18px;
+                color: #e9f4fb;
+                font-weight: 700;
+                cursor: pointer;
+                margin-top: 50px;
+            }
+
+            button:hover {
+                background-color: green;
+                transition: .5s;
+            }
+
+            .head_A {
+                font-family: 'Hi Melody', cursive;
+                text-decoration: none;
+                color: white;
+                font-weight: bold;
+                font-size: 25px;
+                border-radius: 10px;
+                padding: 5px 10px 5px 40px;
+                postion: relative;
+            }
+
+            .head_A:before {
+                background-image: url("../static/car.png");
+                background-size: 30px 30px;
+                display: inline-block;
+                width: 30px;
+                height: 30px;
+                content:"";
+                position: absolute;
+                left: 7px;
+            }
+        </style>
+
+        <script>
+            function onclickSearch() {
+
+                let sido_val = $('#sido').val()
+
+                $.ajax({
+                    type: "POST",
+                    url: "/list",
+                    data: {sido_give: sido_val},
+                    success: function (response) {
+                        if (response["result"] == "success") {
+                            clusterer.clear(); // 응답을 받아왔을떄, clusterer 초기화
+
+                            let list = response.list;
+                            let markers = [];
+                            let infoWindows = [];
+
+                            for (let i = 0; i < list.length; i++) {
+                                let camp_address = list[i].address;
+                                let camp_name = list[i].camp_name;
+                                let camp_X = list[i].mapX;
+                                let camp_Y = list[i].mapY;
+                                let camp_key = list[i].camp_id;
+                                let phone = list[i].phone;
+                                let feature = list[i].feature;
+                                let homepage = list[i].homepage;
+                                let story = list[i].onelinestory;
+                                let intro = list[i].intro;
+                                let url_image = list[i].image_url;
+
+                                let markerPosition = new kakao.maps.LatLng(camp_X, camp_Y);
+                                // 마커가 표시될 위치입니다.(데이터 베이스에서 위도,경도 camp_X :위도 , camp_Y :경도)
+                                let marker = new kakao.maps.Marker({
+                                    position: markerPosition,
+                                    clickable: true
+                                });
+
+                                let iwContent = `<div class="info_window" style="max-width: 70vw; max-height: 75vh; overflow: scroll; padding: 11px; border : 1px solid black; background-color: gainsboro;
+                                                        ">
+                                                    <div class="image_box" style="display: flex; justify-content: center; align-items: center;">
+                                                    <img src="${url_image}" style="width : 65vw;" alt=""></div>
+
+                                                    <h1 style="font-size : 16px;">${camp_name}</h1>
+                                                    <p style="font-size : 12px; color : dimgrey" >${camp_address}</p>
+                                                    <p style="font-size : 12px; color : dimgrey" >${phone}</p>
+                                                    <p style="font-size : 12px; color : dimgrey" >${feature}</p>
+                                                    <p style="font-size : 12px; color : dimgrey" >${intro}</p>
+                                                    <a href="${homepage}" target="blank" style="font-size : 12px; color : dodgerblue" >${homepage}</a>
+                                                    </div>`
+                                let iwPosition = new kakao.maps.LatLng(camp_X, camp_Y); //인포윈도우 표시 위치입니다
+
+                                let infowindow = new kakao.maps.InfoWindow({
+                                    position : iwPosition,
+                                    content : iwContent,
+                                    removable : true
+                                });
+
+                                markers.push(marker);
+                                infowindow.setZIndex(1);
+                                infoWindows.push(infowindow)
+                            }
+                            for (let i = 0; i < markers.length; i++) {
+                                markers[i].setMap(map);
+                                // 마커가 지도위에 표시되도록 설정합니다.
+                                kakao.maps.event.addListener(markers[i], 'click', function () {
+                                    // 지도에 표시된 다른 infowindow를 지워줘야 함
+                                    infoWindows.forEach(function (infowindow, index) {
+                                        infowindow.close();
+                                    });
+
+                                    // 마커 위에 인포윈도우를 표시합니다
+                                    infoWindows[i].open(map, markers[i]);
+                                });
+                            }
+                            clusterer.addMarkers(markers);
+                        }
+                    }
+                })
+            }
+        </script>
+
+    </head>
+    <body>
+        <header>
+            <div class="logo_container">
+                <a href="/" class="head_A">
+                    캠핑따라 맛따라
+                </a>
+            </div>
+        </header>
+
+        <section>
+            <div class="search">
+                <div class="text-area">
+                    <h1>공개 캠핑장 찾기</h1>
+                    <P>가고싶은 지역이 어디신가요?<br>
+                        탭에서 '지역'을 선택해 주세요.
+                    </P>
+                    <div class="box"></div>
+
+                    <div class="select">
+                        <select id="sido">
+                            <option value="서울">서울</option>
+                            <option value="경기">경기도</option>
+                            <option value="충청">충청도</option>
+                            <option value="전라">전라도</option>
+                            <option value="경상">경상도</option>
+                            <option value="강원">강원도</option>
+                            <option value="제주">제주도</option>
+                        </select>
+                    </div>
+                    <button type="button" onclick="onclickSearch()" class="btn">찾기</button>
+
+                </div>
+            </div>
+            <div class="map_search">
+                <div id="map" style="width:100%;height:150vw;"></div>
+            </div>
+
+            <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=2278501db03cc9b91e0a5d5345025fa2&libraries=clusterer"></script>
+            <!-- appkey= 부분에 받은 javascript인증키를 넣어줍니다. -->
+            <script>
+                var container = document.getElementById('map');
+                var options = {
+                    center: new kakao.maps.LatLng(37.59029757506694, 127.10029414904892), // 지도의 중심좌표
+                    level: 12
+                };
+
+                // 지도를 생성한다
+                var map = new kakao.maps.Map(container, options);
+
+                var clusterer = new kakao.maps.MarkerClusterer({
+                    map: map, // 마커들을 클러스터로 관리하고 표시할 지도 객체
+                    averageCenter: true, // 클러스터에 포함된 마커들의 평균 위치를 클러스터 마커 위치로 설정
+                    minLevel: 10 // 클러스터 할 최소 지도 레벨
+                });
+            </script>
+
+        </section>
+    </body>
+</html>

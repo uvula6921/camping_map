@@ -45,11 +45,11 @@ for camp_item in camp_info:
       'mapX': mapX,
       'mapY': mapY,
       'camp_id': contentId,
-      'phone' : phone,
-      'feature' : feature,
-      'homepage' : homepage,
-      'onelinestory' : story,
-      'intro' : intro,
+      'phone': phone,
+      'feature': feature,
+      'homepage': homepage,
+      'onelinestory': story,
+      'intro': intro,
       'image_url': image_url
    }
 	# 도큐먼트를 만들어 딕셔너리 형태로 Key에 넣습니다.
