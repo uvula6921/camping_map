@@ -3,7 +3,6 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="../static/css/camping_search.css">
         <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;300;400;500;700;900&display=swap"
               rel="stylesheet">
         <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -18,6 +17,10 @@
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
                 integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
                 crossorigin="anonymous"></script>
+
+        <link rel="stylesheet" href="./static/fullpage.min.css" />
+        <script src="./static/fullpage.min.js"></script>
+
         <title>캠핑장 찾기</title>
         <style>
             * {
@@ -164,6 +167,8 @@
                             let list = response.list;
                             let markers = [];
                             let infoWindows = [];
+                            let total_X = 0;
+                            let total_Y = 0;
 
                             for (let i = 0; i < list.length; i++) {
                                 let camp_address = list[i].address;
@@ -208,9 +213,13 @@
                                 markers.push(marker);
                                 infowindow.setZIndex(1);
                                 infoWindows.push(infowindow)
+
+                                total_X += parseFloat(camp_X);
+                                total_Y += parseFloat(camp_Y);
+
                             }
                             for (let i = 0; i < markers.length; i++) {
-                                markers[i].setMap(map);
+                                // markers[i].setMap(map);
                                 // 마커가 지도위에 표시되도록 설정합니다.
                                 kakao.maps.event.addListener(markers[i], 'click', function () {
                                     // 지도에 표시된 다른 infowindow를 지워줘야 함
@@ -223,6 +232,16 @@
                                 });
                             }
                             clusterer.addMarkers(markers);
+
+                            let average_X = Math.round(total_X / markers.length * 10000) / 10000
+                            let average_Y = Math.round(total_Y / markers.length * 10000) / 10000
+
+                            console.log(average_X, average_Y)
+                            // 이동할 위도 경도 위치를 생성합니다
+                            var moveLatLon = new kakao.maps.LatLng(average_X, average_Y);
+
+                            // 지도 중심을 이동 시킵니다
+                            map.setCenter(moveLatLon);
                         }
                     }
                 })
@@ -240,31 +259,36 @@
         </header>
 
         <section>
-            <div class="search">
-                <div class="text-area">
-                    <h1>공개 캠핑장 찾기</h1>
-                    <P>가고싶은 지역이 어디신가요?<br>
-                        탭에서 '지역'을 선택해 주세요.
-                    </P>
-                    <div class="box"></div>
+            <div id="fullpage">
+                <div class="section active">
+                    <div class="search">
+                        <div class="text-area">
+                            <h1>캠핑이 마려우신가요?</h1>
+                            <P>가고싶은 지역이 어디신가요?<br>
+                                탭에서 '지역'을 선택해 주세요.
+                            </P>
+                            <div class="box"></div>
 
-                    <div class="select">
-                        <select id="sido">
-                            <option value="서울">서울</option>
-                            <option value="경기">경기도</option>
-                            <option value="충청">충청도</option>
-                            <option value="전라">전라도</option>
-                            <option value="경상">경상도</option>
-                            <option value="강원">강원도</option>
-                            <option value="제주">제주도</option>
-                        </select>
+                            <div class="select">
+                                <select id="sido">
+                                    <option value="서울">서울</option>
+                                    <option value="경기">경기도</option>
+                                    <option value="충청">충청도</option>
+                                    <option value="전라">전라도</option>
+                                    <option value="경상">경상도</option>
+                                    <option value="강원">강원도</option>
+                                    <option value="제주">제주도</option>
+                                </select>
+                            </div>
+                            <button type="button" onclick="onclickSearch()" class="btn"><a href="#sec2" style="text-decoration: none; color: inherit;">찾기</a></button>
+                        </div>
                     </div>
-                    <button type="button" onclick="onclickSearch()" class="btn">찾기</button>
-
                 </div>
-            </div>
-            <div class="map_search">
-                <div id="map" style="width:100%;height:150vw;"></div>
+                <div class="section">
+                    <div class="map_search">
+                        <div id="map" style="width:100%;height:150vw;"></div>
+                    </div>
+                </div>
             </div>
 
             <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=2278501db03cc9b91e0a5d5345025fa2&libraries=clusterer"></script>
@@ -285,6 +309,18 @@
                     minLevel: 10 // 클러스터 할 최소 지도 레벨
                 });
             </script>
+
+            <script>
+                $(document).ready(function() {
+                    new fullpage('#fullpage', {
+                        licenseKey: '',
+                        navigation: true,
+                        anchors: ['sec1', 'sec2'],
+                        normalScrollElements: '.map_search > #map',
+                    });
+                });
+            </script>
+
 
         </section>
     </body>
